@@ -3,7 +3,7 @@ param(
     [string]$DatabaseName = "your-database-name",
     [string]$SqlAdminUser = "your-sql-admin-username",
     [string]$SqlAdminPassword = "your-sql-admin-password",
-    [string]$BackupScript = "INSERT INTO YourTable_Backup SELECT * FROM YourTable WHERE NOT EXISTS (SELECT 1 FROM YourTable_Backup WHERE YourTable_Backup.PrimaryKey = YourTable.PrimaryKey);"
+    [string]$BackupScript = "TRUNCATE TABLE YourTable_Backup; INSERT INTO YourTable_Backup SELECT * FROM YourTable;"
 )
 
 # Install the Az.Sql module if not already available
