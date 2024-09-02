@@ -1,0 +1,26 @@
+param(
+    [string]$SqlServerName = "your-sql-server.database.windows.net",
+    [string]$DatabaseName = "your-database-name",
+    [string]$SqlAdminUser = "your-sql-admin-username",
+    [string]$SqlAdminPassword = "your-sql-admin-password",
+    [string]$BackupScript = "INSERT INTO YourTable_Backup SELECT * FROM YourTable WHERE NOT EXISTS (SELECT 1 FROM YourTable_Backup WHERE YourTable_Backup.PrimaryKey = YourTable.PrimaryKey);"
+)
+
+# Install the Az.Sql module if not already available
+if (-not (Get-Module -ListAvailable -Name Az.Sql)) {
+    Install-Module -Name Az.Sql -Force
+}
+
+# Connect to Azure SQL Database
+$connectionString = "Server=tcp:$SqlServerName,1433;Initial Catalog=$DatabaseName;Persist Security Info=False;User ID=$SqlAdminUser;Password=$SqlAdminPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+$connection = New-Object System.Data.SqlClient.SqlConnection
+$connection.ConnectionString = $connectionString
+$connection.Open()
+
+# Run the backup script
+$command = $connection.CreateCommand()
+$command.CommandText = $BackupScript
+$command.ExecuteNonQuery()
+
+# Close the connection
+$connection.Close()
